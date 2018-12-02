@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Submit url{% endblock %}
+
+{% macro print_comments(comments, level) %}
+    {% import _self as macros %}
+    {% for comment in comments %}
+        <li class="list-item">
+            <span class="tag is-info">{{ comment.ups|default('?') }}</span>
+            <b>{{ comment.author }}</b>
+
+            <br/>
+            {{ comment.bodyHtml|unescape|raw }}
+
+            <br/>
+
+            {% if comment.replies | length > 0 %}
+            <ul class="list">
+                {{ macros.print_comments(comment.replies, level + 1) }}
+            </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="content">
+                <div class="columns">
+
+                    <div class="column is-half">
+                        <h1 class="title">
+                            <span class="tag is-info">{{ post.ups }}</span>
+                            {{ post.title }}
+                        </h1>
+                        <p class="subtitle">{{ post.selftextHtml|unescape|raw }}</p>
+                    </div>
+
+                    <div class="column">
+                        <ul class="list">
+                            {{ macros.print_comments(post.comments, 0) }}
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,11 @@
+framework:
+    messenger:
+        transports:
+#             Uncomment the following line to enable a transport named "amqp"
+             amqp_processor: '%env(MESSENGER_TRANSPORT_DSN)%%2f/reddit-posts-watcher'
+             amqp_notifier: '%env(MESSENGER_TRANSPORT_DSN)%%2f/reddit-posts-notifications'
+
+        routing:
+            # Route your messages to the transports
+             'App\Service\NewPostsProcessor\Message\ProcessPost': amqp_processor
+             'App\Service\NewPostsProcessor\Message\PostProcessed': amqp_notifier

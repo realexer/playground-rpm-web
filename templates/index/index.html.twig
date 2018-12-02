@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Submit url{% endblock %}
+
+{% block body %}
+
+    <section class="section" id="reddit-posts-watcher">
+        <div class="container">
+            <div class="content">
+                <div class="columns">
+
+                    <div class="column is-three-quarters">
+                        <h1 class="title">Current posts</h1>
+                        <table>
+                            {% for post in posts  %}
+                                <tr>
+                                    <td>
+                                        <h3>
+                                            <span class="tag is-info">{{ post.ups }}</span>
+                                            <a class="subtitle" href="/post/{{ post.id }}">{{ post.title }}</a>
+                                        </h3>
+                                    </td>
+                                    <td>{{ post.comments | length }}</td>
+                                    <td><a href="{{ post.url }}">➡️</a> </td>
+                                </tr>
+                            {% else %}
+                                no posts
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h1 class="title">
+                            Add New
+                        </h1>
+                        <form method="POST" action="/submitUrl"
+                              avj-action="processForm"
+                              avj-processForm-wait="user"
+                              avj-processForm-user-when="submit"
+                              avj-processForm-user-noDef="true"
+                              avj-processForm-ifValid="execute"
+                              avj-processForm-context="this"
+                              avj-execute-func="rdw.send(formData.url)">
+                            <div class="field is-grouped">
+                                <div class="control">
+                                    <input class="input" name="url" placeholder="url"/>
+                                </div>
+                                <div class="control">
+                                    <input class="button is-link" type="submit" value="Submit"/>
+                                </div>
+                            </div>
+
+                        </form>
+                        <br/>
+                        {% verbatim %}
+                        <div class="" avj-preserve-content="true" avj-action="draw, hide, clearHTML"
+                             avj-draw-wait="event"
+                             avj-draw-event-when="RedditPostsWatcher.postSubmitted"
+                             avj-draw-after="show"
+                             avj-draw-context="this"
+                             avj-hide-wait="now, trigger"
+                             avj-hide-id="HidePostSubmittedNotification">
+                            <div class="notification is-primary">
+                                <button class="delete" avj-action="trigger"
+                                        avj-trigger-wait="user"
+                                        avj-trigger-user-when="click"
+                                        avj-trigger-action="HidePostSubmittedNotification"></button>
+
+                                Post was submitted [{{ event.url }}]
+                            </div>
+                            <br/>
+                        </div>
+                        <div class="" avj-preserve-content="true" avj-action="draw, hide, clearHTML"
+                             avj-draw-wait="event"
+                             avj-draw-event-when="RedditPostsWatcher.postFailedToSubmit"
+                             avj-draw-after="show"
+                             avj-draw-context="this"
+                             avj-hide-wait="now, trigger"
+                             avj-hide-id="HidePostFailedToAddNotification">
+                            <div class="notification is-danger">
+                                <button class="delete" avj-action="trigger"
+                                        avj-trigger-wait="user"
+                                        avj-trigger-user-when="click"
+                                        avj-trigger-action="HidePostFailedToAddNotification"></button>
+
+                                Failed to submit post [{{ event.error }}]
+                            </div>
+                            <br/>
+                        </div>
+                        <div class="" avj-preserve-content="true" avj-action="draw, hide, clearHTML"
+                             avj-draw-wait="event"
+                             avj-draw-event-when="RedditPostsWatcher.postProcessed"
+                             avj-draw-after="show"
+                             avj-draw-context="this"
+                             avj-hide-wait="now, trigger"
+                             avj-hide-id="HidePostAddedNotification">
+                            <div class="notification is-success">
+                                <button class="delete" avj-action="trigger"
+                                        avj-trigger-wait="user"
+                                        avj-trigger-user-when="click"
+                                        avj-trigger-action="HidePostAddedNotification"></button>
+
+                                Post was processed [{{ event.msg.url }}]
+                            </div>
+                            <br/>
+                        </div>
+                        {% endverbatim %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('assets/js/SSEClient.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/reddit-posts-watcher.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+        {
+            AvoidJS.core.Threader.putInQueue(() => {
+
+                AvoidJS.cmd.init(document.body);
+            });
+        });
+    </script>
+{% endblock %}
+

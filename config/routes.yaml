@@ -1,0 +1,30 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+index:
+    path: /
+    controller: App\Controller\IndexController::index
+   
+test:
+    path: /test
+    controller: App\Controller\IndexController::test
+
+send:
+    path: /send
+    controller: App\Controller\IndexController::send
+
+submitUrl:
+    methods: [POST]
+    path: /submitUrl
+    controller: App\Controller\IndexController::submitUrl
+
+viewPost:
+    methods: [GET]
+    path: /post/{id}
+    controller: App\Controller\IndexController::viewPost
+
+api_submitPost:
+    methods: [POST]
+    path: /api/submitUrl
+    controller: App\Controller\ApiController::submitUrl
